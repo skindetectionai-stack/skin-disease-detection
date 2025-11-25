@@ -3,8 +3,10 @@ import { Camera, UploadCloud, Activity, Zap, XCircle, CheckCircle, AlertTriangle
 
 // ================= Configuration =================
 // CRITICAL: Replace 'YOUR_API_KEY_HERE' with a valid key.
+// The key below is a placeholder. You must use a genuine API key 
+// from Google AI Studio or Google Cloud, and ideally secure it as a GitHub Secret.
 const USER_API_KEY = 'AIzaSyClr14CAWBVITR6oi24fKkHxkPBAuc5pEI'; 
-const GEMINI_VISION_MODEL = 'gemini-2.5-flash'; // Using the stable, up-to-date model name
+const GEMINI_VISION_MODEL = 'gemini-2.5-flash'; // Using the stable, current model name
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 // =================================================
 
@@ -45,9 +47,9 @@ const App = () => {
 
   // --- NEW DIAGNOSTIC FUNCTION ---
   const checkApiStatus = useCallback(async () => {
-    if (!USER_API_KEY) {
+    if (!USER_API_KEY || USER_API_KEY === 'AIzaSyClr14CAWBVITR6oi24fKkHxkPBAuc5pEI') {
       setApiStatus('FAILED');
-      setError("API Key is missing. Please set USER_API_KEY in the config section.");
+      setError("API Key is missing or is the placeholder key. Please replace 'AIzaSyClr14CAWBVITR6oi24fKkHxkPBAuc5pEI' with your actual, valid Google AI API key in the configuration section.");
       return;
     }
     setApiStatus('PENDING');
@@ -75,9 +77,9 @@ const App = () => {
         if (response.status === 404) {
           message = `HTTP 404: Model not found. Check if '${GEMINI_VISION_MODEL}' is the correct, current model name, or if the API_BASE is correct.`;
         } else if (response.status === 400 && errorData.error?.message.includes('API_KEY_INVALID')) {
-          message = "HTTP 400: Invalid API Key. Please verify your USER_API_KEY is correct.";
+          message = "HTTP 400: Invalid API Key. Please verify your USER_API_KEY is correct and active.";
         } else if (response.status === 403) {
-          message = "HTTP 403: Forbidden/Permission Denied. Check if the key has the correct permissions.";
+          message = "HTTP 403: Forbidden/Permission Denied. Check if the key has the correct permissions (e.g., billing is enabled).";
         } else {
           message += (errorData.error?.message ? ` Details: ${errorData.error.message}` : '');
         }
@@ -92,7 +94,7 @@ const App = () => {
 
     } catch (err) {
       setApiStatus('FAILED');
-      setError(`Network or Unknown Error: ${err.message}. Check your internet connection.`);
+      setError(`Network or Unknown Error: ${err.message}. Check your internet connection or Firewall settings.`);
     }
   }, [fetchWithRetry]);
 
@@ -103,8 +105,8 @@ const App = () => {
       setError("Please upload or capture an image first.");
       return;
     }
-    if (!USER_API_KEY) {
-      setError("API Key is missing. Please set USER_API_KEY in the config section.");
+    if (!USER_API_KEY || USER_API_KEY === 'AIzaSyClr14CAWBVITR6oi24fKkHxkPBAuc5pEI') {
+      setError("API Key is missing or is the placeholder key. Analysis cannot proceed.");
       return;
     }
 
